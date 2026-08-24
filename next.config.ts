@@ -7,7 +7,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'www.fffuel.co' },
       { protocol: 'https', hostname: 'api.codingthailand.com' },
-    ]
+    ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   }
 };
 

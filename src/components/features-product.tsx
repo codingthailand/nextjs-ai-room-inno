@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CartButton from "@/app/(front)/components/CartButton";
-import Image from "next/image";
+import ProductImage from "@/app/(front)/components/ProductImage";
 
 type Props = {
   products: any[]
@@ -18,14 +18,13 @@ const FeaturesProduct = ({ products }: Props) => {
           <div className="rounded-xl border bg-card px-6 py-7" key={product.id}>
 
             <div className="relative mb-5 aspect-4/5 w-full overflow-hidden rounded-xl sm:mb-6">
-              <Image
-                alt={product.name}
-                className="size-full bg-muted object-cover"
-                width={0}
-                height={0}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                src={`/product-image/${product.picture}`}
-                loading="eager"
+              <ProductImage
+                alt={product.name ?? ""}
+                src={
+                  product.product_images?.[0]
+                    ? `/product-image/${product.product_images[0].image_name}`
+                    : null
+                }
               />
             </div>
 

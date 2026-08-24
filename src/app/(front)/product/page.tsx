@@ -9,7 +9,9 @@ export const instant = false;
 // http://localhost:3000/product
 export default async function ProductPage() {
   await connection(); // signals this is a dynamic route
-  const products = await prisma.product.findMany();
+  const products = await prisma.products.findMany({
+    include: { product_images: true },
+  });
   
   // แปลง Decimal → number ก่อนส่งให้ Client Component
   const serializedProducts = products.map((p) => ({
