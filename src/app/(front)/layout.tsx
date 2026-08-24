@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Prompt, Roboto, Lora } from "next/font/google";
+import { Prompt, Open_Sans, Lora, Source_Code_Pro } from "next/font/google";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/navbar";
 import "../globals.css";
@@ -9,20 +9,27 @@ import "../globals.css";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const loraHeading = Lora({subsets:['latin'],variable:'--font-heading'});
+const loraHeading = Lora({ subsets: ["latin"], variable: "--font-heading" });
 
-const roboto = Roboto({subsets:['latin'],variable:'--font-sans'});
-
-export const promptFont = Prompt({
-  weight: ['400', '500', '700'],
-  subsets: ['thai'],
-  display: 'swap'
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
 });
 
+const sourceCodePro = Source_Code_Pro({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
+
+export const promptFont = Prompt({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["thai"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "ระบบ E-Commerce COSCI",
-  description: "เรียนรู้การเขียน Nex.tjs",
+  description: "เรียนรู้การเขียน Next.js",
 };
 
 export default function RootLayout({
@@ -33,7 +40,13 @@ export default function RootLayout({
   return (
     <html
       lang="th"
-      className={cn(promptFont.className, "font-sans", roboto.variable, loraHeading.variable)}
+      className={cn(
+        promptFont.className,
+        "font-sans",
+        openSans.variable,
+        loraHeading.variable,
+        sourceCodePro.variable
+      )}
     >
       <body>
         <Suspense fallback={<div className="h-16 border-b bg-background" />}>

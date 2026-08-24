@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Clock } from "lucide-react";
 
 type Props = {
   courses: any[];
@@ -7,44 +9,54 @@ type Props = {
 
 const FeaturesCourse = ({ courses }: Props) => {
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 py-20">
-      <div className="w-full grow sm:max-w-(--breakpoint-md) lg:max-w-(--breakpoint-lg)">
-        <h2 className="mx-auto text-center font-medium text-4xl tracking-[-0.045em] sm:text-[2.75rem]/[1.2]">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
+      <div className="text-center">
+        <p className="text-xs font-bold uppercase tracking-[0.09em] text-tertiary">
           หลักสูตรทั้งหมด
-        </h2>
-        <p className="mt-3 text-pretty text-center text-lg text-muted-foreground tracking-[-0.01em] sm:text-2xl">
-          No complex configs. Just copy, paste, and start building
         </p>
-        <div className="mt-18 grid w-full gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <div
-              className="flex w-full flex-col text-start"
-              key={course.title}
-            >
-              <div className="relative mb-5 aspect-4/5 w-full overflow-hidden rounded-xl sm:mb-6">
-                <Image
-                  alt={course.title}
-                  className="size-full bg-muted object-cover"
-                  width={0}
-                  height={0}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  src={course.picture}
-                  loading="eager"
-                />
-              </div>
-              <div className="px-1">
-                <span className="font-medium text-[22px] tracking-[-0.015em]">
-                  {course.title}
-                </span>
-                <p className="mt-1 max-w-[25ch] text-[17px] text-muted-foreground">
-                  {course.detail}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <h2 className="mt-3 font-heading text-4xl font-semibold leading-tight tracking-[0.005em] sm:text-5xl">
+          เรียนรู้จากผู้ลงมือจริง
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">
+          หลักสูตรที่ออกแบบโดยผู้มีประสบการณ์ตรง สอนจากของจริง
+          ไม่มี config ซับซ้อน เริ่มสร้างได้ทันที
+        </p>
       </div>
-    </div>
+
+      <div className="mt-14 grid w-full gap-x-6 gap-y-12 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+        {courses.map((course) => (
+          <article key={course.title} className="flex flex-col">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-border bg-muted">
+              <Image
+                alt={course.title}
+                className="size-full object-cover transition-transform duration-300 hover:scale-[1.03]"
+                width={0}
+                height={0}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                src={course.picture}
+                loading="eager"
+              />
+            </div>
+            <div className="flex flex-1 flex-col px-1 pt-5">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="tertiary" className="text-[11px] font-bold uppercase tracking-[0.09em]">
+                  หลักสูตร
+                </Badge>
+                <Badge variant="outline" className="text-[11px] font-bold uppercase tracking-[0.09em]">
+                  <Clock className="size-3" /> เรียนรู้ได้ตลอดชีพ
+                </Badge>
+              </div>
+              <h3 className="mt-3 font-heading text-[22px] font-semibold leading-snug tracking-[-0.015em]">
+                {course.title}
+              </h3>
+              <p className="mt-2 max-w-[30ch] text-[15px] leading-relaxed text-muted-foreground">
+                {course.detail}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 };
 

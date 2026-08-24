@@ -20,6 +20,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Logo } from "@/components/logo"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 
@@ -62,8 +63,12 @@ export default function LoginForm() {
   }
 
   return (
-  <div className="min-h-screen flex items-center justify-center">
-    <Card className="w-full sm:max-w-md">
+  <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,rgba(212,163,115,0.2),transparent_60%)] px-4 py-12">
+    <div className="w-full sm:max-w-md">
+      <div className="mb-8 flex justify-center">
+        <Logo />
+      </div>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>เข้าสู่ระบบ</CardTitle>
         <CardDescription>
@@ -124,12 +129,13 @@ export default function LoginForm() {
         </Button>
         <p className="text-center text-sm text-muted-foreground">
           ยังไม่มีบัญชี?{" "}
-          <a href="/register" className="underline underline-offset-4 hover:text-primary">
+          <a href="/signup" className="underline underline-offset-4 hover:text-primary">
             สมัครสมาชิก
           </a>
         </p>
       </CardFooter>
     </Card>
+    </div>
     </div>
   )
 }

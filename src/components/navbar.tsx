@@ -16,21 +16,31 @@ const Navbar = async () => {
   });
 
   return (
-    <nav className="h-16 border-b bg-background">
+    <nav className="sticky top-0 z-40 h-16 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 sm:px-6 lg:px-8">
         <Logo />
 
         {/* Desktop Menu */}
         <NavMenu className="hidden md:block" />
 
-        <Link href="/cart">
-          <Badge className="p-2 text-md">
-            <ShoppingBasket /> <CountCartItem /> ชิ้น
-          </Badge>
-        </Link>
-
         <div className="flex items-center gap-3">
-          
+          <Button asChild variant="outline" className="hidden sm:inline-flex">
+            <Link href="/cart" className="gap-2">
+              <ShoppingBasket className="size-4" />
+              ตะกร้า
+              <Badge variant="default" className="ml-0.5 px-1.5">
+                <CountCartItem />
+              </Badge>
+            </Link>
+          </Button>
+
+          <Button asChild variant="outline" className="sm:hidden">
+            <Link href="/cart">
+              <ShoppingBasket className="size-4" />
+              <CountCartItem />
+            </Link>
+          </Button>
+
           {
             !session && (
               <>
@@ -47,8 +57,8 @@ const Navbar = async () => {
           {
             session && (
               <>
-                <div className="flex items-center mr-4">
-                  สวัสดี, {session.user.name}
+                <div className="mr-2 hidden items-center text-sm text-muted-foreground sm:flex">
+                  สวัสดี, <span className="ml-1 font-semibold text-foreground">{session.user.name}</span>
                 </div>
                 <div>
                   <LogoutButton />
