@@ -14,7 +14,7 @@ async function ApiVersion() {
 
   return (
     <p className="font-mono text-sm text-muted-foreground">
-      API Version:{" "}
+      API เวอร์ชั่น:{" "}
       <span className="font-semibold text-foreground">
         {apiInfo.data.version}
       </span>
