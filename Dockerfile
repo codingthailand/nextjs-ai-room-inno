@@ -28,7 +28,7 @@ RUN npx prisma generate
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN npm run build
+RUN DATABASE_URL="mysql://build:build@localhost:3306/build" npm run build
 
 # Stage 3: Runner
 FROM node:24-alpine AS runner
