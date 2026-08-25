@@ -1,10 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
+import { useEffect, useRef, useState, type FormEvent } from "react"
 import { RiAlertLine, RiCheckLine } from "@remixicon/react"
-
 import { contactSchema, type ContactFormValues } from "@/lib/contact-schema"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Spinner } from "@/components/ui/spinner"
 
 type FormStatus = "idle" | "pending" | "success" | "error"
+
+type FieldErrors = Partial<Record<keyof ContactFormValues, string>>
 
 const fieldIds = {
   name: "contact-name",
@@ -33,18 +32,8 @@ function errorId(field: keyof typeof fieldIds) {
 export default function ContactForm() {
   const [status, setStatus] = useState<FormStatus>("idle")
   const [sendError, setSendError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<FieldErrors>({})
   const successRef = useRef<HTMLParagraphElement>(null)
-
-  const form = useForm<ContactFormValues>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-      website: "",
-    },
-  })
 
   useEffect(() => {
     if (status === "success") {
@@ -52,15 +41,41 @@ export default function ContactForm() {
     }
   }, [status])
 
-  async function onSubmit(data: ContactFormValues) {
-    setStatus("pending")
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const values: ContactFormValues = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      subject: String(formData.get("subject") ?? ""),
+      message: String(formData.get("message") ?? ""),
+      website: String(formData.get("website") ?? ""),
+    }
+
+    const parsed = contactSchema.safeParse(values)
+    if (!parsed.success) {
+      const fieldErrors: FieldErrors = {}
+      for (const [field, messages] of Object.entries(
+        parsed.error.flatten().fieldErrors
+      )) {
+        fieldErrors[field as keyof ContactFormValues] = messages?.[0]
+      }
+      setErrors(fieldErrors)
+      setSendError(null)
+      setStatus("idle")
+      return
+    }
+
+    setErrors({})
     setSendError(null)
+    setStatus("pending")
 
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(parsed.data),
       })
 
       const result: { ok?: boolean; errors?: Record<string, string | undefined>; message?: string } | null =
@@ -68,14 +83,13 @@ export default function ContactForm() {
 
       if (!response.ok || !result?.ok) {
         if (result?.errors) {
+          const fieldErrors: FieldErrors = {}
           for (const [field, message] of Object.entries(result.errors)) {
             if (typeof message === "string" && message) {
-              form.setError(field as keyof ContactFormValues, {
-                type: "server",
-                message,
-              })
+              fieldErrors[field as keyof ContactFormValues] = message
             }
           }
+          setErrors(fieldErrors)
           setSendError("กรุณาตรวจสอบข้อมูลที่กรอกอีกครั้ง")
         } else {
           setSendError(
@@ -94,135 +108,91 @@ export default function ContactForm() {
     }
   }
 
-  function onInvalid() {
-    // ล้างสถานะ success/error เดิมเมื่อ validation ฝั่ง client ไม่ผ่าน
-    setStatus("idle")
-    setSendError(null)
-  }
-
   const isPending = status === "pending"
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} noValidate>
+    <form onSubmit={onSubmit} noValidate>
       <FieldGroup>
-        <Controller
-          name="name"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={fieldIds.name}>ชื่อ</FieldLabel>
-              <Input
-                {...field}
-                id={fieldIds.name}
-                type="text"
-                aria-invalid={fieldState.invalid || undefined}
-                aria-describedby={
-                  fieldState.invalid ? errorId("name") : undefined
-                }
-                placeholder="สมชาย ใจดี"
-                autoComplete="name"
-                disabled={isPending}
-              />
-              {fieldState.invalid && (
-                <FieldError id={errorId("name")} errors={[fieldState.error]} />
-              )}
-            </Field>
+        <Field data-invalid={!!errors.name}>
+          <FieldLabel htmlFor={fieldIds.name}>ชื่อ</FieldLabel>
+          <Input
+            id={fieldIds.name}
+            name="name"
+            type="text"
+            aria-invalid={!!errors.name || undefined}
+            aria-describedby={errors.name ? errorId("name") : undefined}
+            placeholder="สมชาย ใจดี"
+            autoComplete="name"
+            disabled={isPending}
+          />
+          {errors.name && (
+            <FieldError id={errorId("name")}>{errors.name}</FieldError>
           )}
-        />
+        </Field>
 
-        <Controller
-          name="email"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={fieldIds.email}>อีเมล</FieldLabel>
-              <Input
-                {...field}
-                id={fieldIds.email}
-                type="email"
-                aria-invalid={fieldState.invalid || undefined}
-                aria-describedby={
-                  fieldState.invalid ? errorId("email") : undefined
-                }
-                placeholder="you@example.com"
-                autoComplete="email"
-                disabled={isPending}
-              />
-              {fieldState.invalid && (
-                <FieldError id={errorId("email")} errors={[fieldState.error]} />
-              )}
-            </Field>
+        <Field data-invalid={!!errors.email}>
+          <FieldLabel htmlFor={fieldIds.email}>อีเมล</FieldLabel>
+          <Input
+            id={fieldIds.email}
+            name="email"
+            type="email"
+            aria-invalid={!!errors.email || undefined}
+            aria-describedby={errors.email ? errorId("email") : undefined}
+            placeholder="you@example.com"
+            autoComplete="email"
+            disabled={isPending}
+          />
+          {errors.email && (
+            <FieldError id={errorId("email")}>{errors.email}</FieldError>
           )}
-        />
+        </Field>
 
-        <Controller
-          name="subject"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={fieldIds.subject}>หัวข้อ</FieldLabel>
-              <Input
-                {...field}
-                id={fieldIds.subject}
-                type="text"
-                aria-invalid={fieldState.invalid || undefined}
-                aria-describedby={
-                  fieldState.invalid ? errorId("subject") : undefined
-                }
-                placeholder="สอบถามสินค้า"
-                disabled={isPending}
-              />
-              {fieldState.invalid && (
-                <FieldError id={errorId("subject")} errors={[fieldState.error]} />
-              )}
-            </Field>
+        <Field data-invalid={!!errors.subject}>
+          <FieldLabel htmlFor={fieldIds.subject}>หัวข้อ</FieldLabel>
+          <Input
+            id={fieldIds.subject}
+            name="subject"
+            type="text"
+            aria-invalid={!!errors.subject || undefined}
+            aria-describedby={errors.subject ? errorId("subject") : undefined}
+            placeholder="สอบถามสินค้า"
+            disabled={isPending}
+          />
+          {errors.subject && (
+            <FieldError id={errorId("subject")}>{errors.subject}</FieldError>
           )}
-        />
+        </Field>
 
-        <Controller
-          name="message"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={fieldIds.message}>ข้อความ</FieldLabel>
-              <Textarea
-                {...field}
-                id={fieldIds.message}
-                aria-invalid={fieldState.invalid || undefined}
-                aria-describedby={
-                  fieldState.invalid ? errorId("message") : undefined
-                }
-                placeholder="พิมพ์ข้อความที่ต้องการติดต่อ..."
-                rows={5}
-                disabled={isPending}
-              />
-              {fieldState.invalid && (
-                <FieldError id={errorId("message")} errors={[fieldState.error]} />
-              )}
-            </Field>
+        <Field data-invalid={!!errors.message}>
+          <FieldLabel htmlFor={fieldIds.message}>ข้อความ</FieldLabel>
+          <Textarea
+            id={fieldIds.message}
+            name="message"
+            aria-invalid={!!errors.message || undefined}
+            aria-describedby={errors.message ? errorId("message") : undefined}
+            placeholder="พิมพ์ข้อความที่ต้องการติดต่อ..."
+            rows={5}
+            disabled={isPending}
+          />
+          {errors.message && (
+            <FieldError id={errorId("message")}>{errors.message}</FieldError>
           )}
-        />
+        </Field>
 
         {/* Honeypot: มนุษย์มองไม่เห็น ถ้า bot กรอกเข้าไปจะไม่ส่งอีเมลจริง */}
-        <Controller
-          name="website"
-          control={form.control}
-          render={({ field }) => (
-            <div
-              aria-hidden="true"
-              className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
-            >
-              <label htmlFor="contact-website">Website</label>
-              <Input
-                {...field}
-                id="contact-website"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-              />
-            </div>
-          )}
-        />
+        <div
+          aria-hidden="true"
+          className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+        >
+          <label htmlFor="contact-website">Website</label>
+          <Input
+            id="contact-website"
+            name="website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
 
         {sendError && (
           <div
