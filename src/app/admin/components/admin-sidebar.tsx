@@ -1,4 +1,4 @@
-import { LayoutDashboard, Store } from "lucide-react";
+import { LayoutDashboard, Package, Store } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,13 @@ export default function AdminSidebar() {
         >
           <LayoutDashboard className="size-4" />
           Dashboard
+        </Link>
+        <Link
+          href="/admin/products"
+          className="flex items-center gap-2 rounded-sm px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-warm hover:text-foreground"
+        >
+          <Package className="size-4" />
+          สินค้า
         </Link>
       </nav>
 
