@@ -1,6 +1,18 @@
 {
   "version": 1,
   "skills": {
+    "deploy-docker-production": {
+      "source": "codingthailand/my-agent-skill-nt",
+      "sourceType": "github",
+      "skillPath": "skills/deploy-docker-production/SKILL.md",
+      "computedHash": "e4c20c8f0b5a9da956b7ad1de5adb1a1f82968fe72d07114e3ad6d34899178ca"
+    },
+    "git-commit-guide": {
+      "source": "codingthailand/my-agent-skill-nt",
+      "sourceType": "github",
+      "skillPath": "skills/git-commit-guide/SKILL.md",
+      "computedHash": "fd38d87772a30e71bfcd751bdd31def74227fba612ac109b76e076fcf99c6cda"
+    },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
