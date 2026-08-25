@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Prompt, Open_Sans, Lora, Source_Code_Pro } from "next/font/google";
+import { connection } from "next/server";
 import { cn } from "@/lib/utils";
 import "../globals.css";
+import AdminShell from "./components/admin-shell";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -27,11 +29,13 @@ export const metadata: Metadata = {
   description: "ระบบจัดการร้านค้า",
 };
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connection();
+
   return (
     <html
       lang="th"
@@ -43,7 +47,9 @@ export default function AdminLayout({
         sourceCodePro.variable
       )}
     >
-      <body>{children}</body>
+      <body>
+        <AdminShell>{children}</AdminShell>
+      </body>
     </html>
   );
 }
